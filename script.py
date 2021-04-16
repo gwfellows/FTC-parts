@@ -22,7 +22,6 @@ for section_link in section_links:
 
         for step_link in step_links:
             filename = "./"+step_link.replace('/content/step_files/', '')
-            print(filename)
             with open(filename, 'wb') as file:
                 file.write(requests.get(
                     'https://www.gobilda.com'+step_link).content)
