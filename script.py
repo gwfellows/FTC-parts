@@ -22,6 +22,7 @@ for section_link in section_links:
 
         for step_link in step_links:
             filename = "./"+step_link.replace('/content/step_files/', '')
+            print("Processing "+filename+"...")
             with open(filename, 'wb') as file:
                 file.write(requests.get(
                     'https://www.gobilda.com'+step_link).content)
@@ -30,9 +31,12 @@ for section_link in section_links:
                     if len(to_unzip.namelist()) > 1:
                         to_unzip.close()
                         os.remove(filename)
+                        print("Done\n")
                         break
                     to_unzip.extractall()
             else:
                 os.remove(filename)
+                print("Done\n")
                 break
             os.remove(filename)
+            print("Done\n")
