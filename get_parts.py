@@ -1,10 +1,13 @@
 from bs4 import BeautifulSoup
 import requests
+import shutil
 import zipfile
 import os
 
 
 def get_goBILDA_parts():
+    filepath = "./goBILDA"
+
     sitemap_page = requests.get(
         'https://www.gobilda.com/sitemap/categories/', allow_redirects=True)
     section_links = (str(a['href']) for a in BeautifulSoup(sitemap_page.content, 'html.parser').find(
@@ -23,7 +26,8 @@ def get_goBILDA_parts():
                 part_page.content, 'html.parser').find_all('a', class_='product-downloadsList-listItem-link ext-zip'))
 
             for step_link in step_links:
-                filename = "./"+step_link.replace('/content/step_files/', '')
+                filename = filepath + \
+                    step_link.replace('/content/step_files/', '')
                 print("Processing "+filename+"...")
                 with open(filename, 'wb') as file:
                     file.write(requests.get(
@@ -44,4 +48,24 @@ def get_goBILDA_parts():
                 print("Done\n")
 
 
-def get_goBILDA_parts()
+def get_REV_parts():
+    filepath = "./REV/ALL-REV-PARTS-STEP.zip"
+    partslink = "https://www.revrobotics.com/content/cad/ALL-REV-PARTS-STEP.zip"
+    with open(filepath, 'wb') as file:
+        file.write(requests.get(partslink).content)
+    with zipfile.ZipFile(filepath, "r") as to_unzip:
+        to_unzip.extractall(path="./REV")
+    shutil.copytree("./REV/Already Uploaded", "./REV", dirs_exist_ok=True)
+    os.remove(filepath)
+    shutil.rmtree("./REV/Already Uploaded")
+
+    files_in_directory = os.listdir("./REV")
+    filtered_files = [
+        file for file in files_in_directory if not file.endswith(".STEP")]
+    for file in filtered_files:
+        path_to_file = "./REV/"+file
+        os.remove(path_to_file)
+
+
+get_REV_parts()
+get_goBILDA_parts()
